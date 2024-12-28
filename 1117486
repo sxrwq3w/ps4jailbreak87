@@ -1,0 +1,1225 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PS4 Games</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #1c1c2e;
+            color: #ffffff;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: auto;
+        }
+
+        header {
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        input[type="text"] {
+            padding: 10px;
+            width: 80%;
+            max-width: 400px;
+            margin: 10px 0;
+            border: 1px solid #333;
+            border-radius: 5px;
+            background-color: #2b2b3d;
+            color: #ffffff;
+        }
+
+        #gamesList {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            padding: 20px 0;
+        }
+
+        .game-item {
+            background-color: #2b2b3d;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .game-item img {
+            max-width: 100%;
+            border-radius: 8px;
+        }
+
+        .game-item h3 {
+            margin: 10px 0;
+        }
+
+        .game-item button {
+            padding: 10px 20px;
+            background-color: #007acc;
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .game-item button:hover {
+            background-color: #005f99;
+        }
+
+        .game-details {
+            display: none;
+        }
+
+        .back-button {
+            padding: 10px 20px;
+            background-color: #e74c3c;
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+
+        .back-button:hover {
+            background-color: #c0392b;
+        }
+
+        .slider {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin: auto;
+            overflow: hidden;
+            border-radius: 8px;
+        }
+
+        .slider img {
+            width: 100%;
+            display: none;
+        }
+
+        .slider img.active {
+            display: block;
+        }
+
+        .slider .arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: rgba(0, 0, 0, 0.5);
+            color: #ffffff;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 50%;
+        }
+
+        .slider .arrow.left {
+            left: 10px;
+        }
+
+        .slider .arrow.right {
+            right: 10px;
+        }
+
+        .links a {
+            display: block;
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #007acc;
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 8px;
+            text-align: center;
+            transition: background-color 0.3s;
+        }
+
+        .links a:hover {
+            background-color: #005f99;
+        }
+
+        .feature-description {
+            display: none;
+            padding: 10px;
+            background-color: #2b2b3d;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+
+        .feature-title {
+            cursor: pointer;
+            padding: 10px;
+            background-color: #007acc;
+            color: #ffffff;
+            border-radius: 8px;
+            text-align: left;
+            margin-top: 10px;
+        }
+
+        .feature-title:hover {
+            background-color: #005f99;
+        }
+    </style>
+    <script>
+        function showSlide(slides, index) {
+            slides.forEach((slide, i) => {
+                slide.classList.toggle("active", i === index);
+            });
+        }
+
+        function nextSlide(slides) {
+            let currentSlideIndex = Array.from(slides).findIndex(slide => slide.classList.contains("active"));
+            currentSlideIndex = (currentSlideIndex + 1) % slides.length;
+            showSlide(slides, currentSlideIndex);
+        }
+
+        function prevSlide(slides) {
+            let currentSlideIndex = Array.from(slides).findIndex(slide => slide.classList.contains("active"));
+            currentSlideIndex = (currentSlideIndex - 1 + slides.length) % slides.length;
+            showSlide(slides, currentSlideIndex);
+        }
+
+        function initSlider(sliderId) {
+            const slides = document.querySelectorAll(`#${sliderId} img`);
+            const nextBtn = document.querySelector(`#${sliderId} .right`);
+            const prevBtn = document.querySelector(`#${sliderId} .left`);
+
+            nextBtn.addEventListener("click", () => nextSlide(slides));
+            prevBtn.addEventListener("click", () => prevSlide(slides));
+
+            showSlide(slides, 0);
+        }
+
+        function showDetails(gameId) {
+            document.getElementById("gamesList").style.display = "none";
+            document.getElementById(gameId).style.display = "block";
+        }
+
+        function backToList() {
+            const details = document.querySelectorAll(".game-details");
+            details.forEach(detail => detail.style.display = "none");
+            document.getElementById("gamesList").style.display = "grid";
+        }
+
+        function searchGames() {
+            const searchInput = document.getElementById("search").value.toLowerCase();
+            const games = document.querySelectorAll(".game-item");
+
+            games.forEach(game => {
+                const title = game.querySelector("h3").textContent.toLowerCase();
+                game.style.display = title.includes(searchInput) ? "block" : "none";
+            });
+        }
+
+        function toggleDescription(descriptionId) {
+            const description = document.getElementById(descriptionId);
+            description.style.display = description.style.display === "block" ? "none" : "block";
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            for (let i = 1; i <= 100; i++) {
+                initSlider(`slider${i}`);
+            }
+        });
+    </script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🄶🄾🄻🄳 🄷 🄴 🄽 </h1>  
+            
+       <div class="contact">
+        <strong>ᴄᴏᴍᴍᴜɴɪᴄᴀᴛɪᴏɴ</strong>
+        <a href="@WI_FITOP" style="color: #ff4081;">ⓦⓘⓕⓘ ⓣⓞⓟ</a>
+    </div>
+        
+            <input type="text" id="search" placeholder="ابحث عن لعبة..." onkeyup="searchGames()">
+        </header>
+
+        <!-- قائمة الألعاب -->
+        <section id="gamesList">
+            
+            
+            <div class="game-item">
+                <img src="سكايروم.jpg" alt="The Elder Scrolls V">
+                <h3>The Elder Scrolls V</h3>
+                <button onclick="showDetails('The Elder Scrolls V')">ᴅᴏᴡɴʟᴏᴀᴅ ʟɪɴᴋ</button>
+            </div>
+            
+            
+               <div class="game-item">
+                <img src="الجزيزة.jpg_large" alt="Dead Island 2">
+                <h3>Dead Island 2</h3>
+                <button onclick="showDetails('Dead Island 2')">ᴅᴏᴡɴʟᴏᴀᴅ ʟɪɴᴋ</button>
+            </div>
+            
+            <div class="game-item">
+                <img src="ذلاست 2.jpg" alt="Days Gone">
+                <h3>The Last of Us II</h3>
+                <button onclick="showDetails('The Last of Us II')">ᴅᴏᴡɴʟᴏᴀᴅ ʟɪɴᴋ</button>
+            </div>
+            
+           <div class="game-item">
+                <img src="ذلاست1.jpg" alt="Days Gone">
+                <h3>The Last of Us Remastered</h3>
+                <button onclick="showDetails('The Last of Us I')">ᴅᴏᴡɴʟᴏᴀᴅ ʟɪɴᴋ</button>
+            </div> 
+            
+            
+            
+           
+            <div class="game-item">
+                <img src="اكاذيب.jpg" alt="Lies of P">
+                <h3> Lies of P</h3>
+                <button onclick="showDetails('LIES OF P')">ᴅᴏᴡɴʟᴏᴀᴅ ʟɪɴᴋ</button>
+            </div>
+
+            <div class="game-item">
+                <img src="سكيرو.jpg" alt="Sekiro Shadows Die Twice">
+                <h3> Sekiro Shadows Die Twice</h3>
+                <button onclick="showDetails('Sekiro')">ᴅᴏᴡɴʟᴏᴀᴅ ʟɪɴᴋ</button>
+            </div>
+            
+            <div class="game-item">
+                <img src="شبح.jpg" alt=" Ghost of Tsushima">
+                <h3>Ghost of Tsushima</h3>
+                <button onclick="showDetails('Ghost of Tsushima')">ᴅᴏᴡɴʟᴏᴀᴅ ʟɪɴᴋ</button>
+            </div>
+            
+            <div class="game-item">
+                <img src="جاداي1.jpg" alt="STAR WARS Jedi Falle">
+                <h3>STAR WARS Jedi Falle</h3>
+                <button onclick="showDetails('NEWGAME')">ᴅᴏᴡɴʟᴏᴀᴅ ʟɪɴᴋ</button>
+            </div>
+
+            <div class="game-item">
+                <img src="جاداي2.jpg" alt="STAR WARS Jedi: Survivor">
+                <h3>STAR WARS Jedi: Survivor</h3>
+                <button onclick="showDetails('STAR')">ᴅᴏᴡɴʟᴏᴀᴅ ʟɪɴᴋ</button>
+            </div>
+
+            <div class="game-item">
+                <img src="ريد ديد 2.jpg" alt="RED">
+                <h3>Red Dead Redemption 2</h3>
+                <button onclick="showDetails('RED')">ᴅᴏᴡɴʟᴏᴀᴅ ʟɪɴᴋ</button>
+            </div>
+
+            <div class="game-item">
+                <img src="SAW.jpg" alt="Grand Theft Auto V">
+                <h3>Grand Theft Auto V</h3>
+                <button onclick="showDetails('Grand')">ᴅᴏᴡɴʟᴏᴀᴅ ʟɪɴᴋ</button>
+            </div>
+
+
+            <div class="game-item">
+                <img src="بتل فيلد1.jpg" alt="Battlefield 1">
+                <h3>Battlefield 1</h3>
+                <button onclick="showDetails('Battlefield1')">ᴅᴏᴡɴʟᴏᴀᴅ ʟɪɴᴋ</button>
+            </div>
+
+            <div class="game-item">
+                <img src="بتل فيلدv.jpg" alt="Battlefield V">
+                <h3>Battlefield V</h3>
+                <button onclick="showDetails('BattlefieldV')">ᴅᴏᴡɴʟᴏᴀᴅ ʟɪɴᴋ</button>
+            </div>
+
+            <div class="game-item">
+                <img src="هورايزن1.jpg" alt="Horizon Zero Dawn">
+                <h3>Horizon Zero Dawn</h3>
+                <button onclick="showDetails('Horizon Zero Dawn')">ᴅᴏᴡɴʟᴏᴀᴅ ʟɪɴᴋ</button>
+            </div>
+
+            <div class="game-item">
+                <img src="هورايزن2.jpg" alt="Horizon Forbidden West">
+                <h3>Horizon Forbidden West</h3>
+                <button onclick="showDetails('Horizon Forbidden West')">ᴅᴏᴡɴʟᴏᴀᴅ ʟɪɴᴋ</button>
+            </div>
+
+            <div class="game-item">
+                <img src="تومب 1.jpg" alt="Tomb Raider Definitiv">
+                <h3>Tomb Raider Definitiv</h3>
+                <button onclick="showDetails('Tomb Raider Definitiv')">ᴅᴏᴡɴʟᴏᴀᴅ ʟɪɴᴋ</button>
+            </div>
+
+            <div class="game-item">
+                <img src="تومب 2.jpg" alt="Rise of The Tomb Raider">
+                <h3>Driver: San Francisco</h3>
+                <button onclick="showDetails('Rise of The Tomb Raider')">ᴅᴏᴡɴʟᴏᴀᴅ ʟɪɴᴋ</button>
+            </div>
+
+            <div class="game-item">
+                <img src="تومب 3.jpg" alt="No Man's Sky">
+                <h3>Shadow of The Tomb</h3>
+                <button onclick="showDetails('Shadow of The Tomb')">ᴅᴏᴡɴʟᴏᴀᴅ ʟɪɴᴋ</button>
+            </div>
+
+            <div class="game-item">
+                <img src="ايام مضت.jpg" alt="Days Gone">
+                <h3>Days Gone</h3>
+                <button onclick="showDetails('Days Gone')">ᴅᴏᴡɴʟᴏᴀᴅ ʟɪɴᴋ</button>
+            </div>
+            
+            <div class="game-item">
+                <img src="كنترول.jpg" alt="Days Gone">
+                <h3>Control</h3>
+                <button onclick="showDetails('Control')">ᴅᴏᴡɴʟᴏᴀᴅ ʟɪɴᴋ</button>
+            </div>
+            
+            <div class="game-item">
+                <img src="سبايدمان.jpg" alt="Days Gone">
+                <h3>Marvels Spider-Man </h3>
+                <button onclick="showDetails('Marvels Spider-Man')">ᴅᴏᴡɴʟᴏᴀᴅ ʟɪɴᴋ</button>
+            </div>
+            
+           <div class="game-item">
+                <img src="سبايدرمان2.jpg" alt="Days Gone">
+                <h3>Marvels Spaider Man Mailes Morales</h3>
+                <button onclick="showDetails('Marvels Spaider Man Mailes Morales')">ᴅᴏᴡɴʟᴏᴀᴅ ʟɪɴᴋ</button>
+            </div> 
+            
+            <div class="game-item">
+                <img src="مراقبون2.jpg" alt="Watch Dogs 2">
+                <h3>Watch Dogs 2</h3>
+                <button onclick="showDetails('Watch Dogs 2')">ᴅᴏᴡɴʟᴏᴀᴅ ʟɪɴᴋ</button>
+            </div>
+            
+          <div class="game-item">
+                <img src="مراقبون.jpg" alt="">
+                <h3>Watch Dogs Legion</h3>
+                <button onclick="showDetails('Watch Dogs Legion')">ᴅᴏᴡɴʟᴏᴀᴅ ʟɪɴᴋ</button>
+            </div>
+             
+       <div class="game-item">
+                <img src="كوابيس 1.jpg" alt="Little Nightmares">
+                <h3>Little Nightmares</h3>
+                <button onclick="showDetails('Little Nightmares')">ᴅᴏᴡɴʟᴏᴀᴅ ʟɪɴᴋ</button>
+            </div>      
+             
+             <div class="game-item">
+                <img src="المربع.jpg" alt="Little Nightmares II">
+                <h3>Little Nightmares II</h3>
+                <button onclick="showDetails('Little Nightmares II')">ᴅᴏᴡɴʟᴏᴀᴅ ʟɪɴᴋ</button>
+            </div>      
+        <div class="game-item">
+                <img src="روح.jpg" alt="Titan Souls">
+                <h3>Titan Souls</h3>
+                <button onclick="showDetails('Titan Souls')">ᴅᴏᴡɴʟᴏᴀᴅ ʟɪɴᴋ</button>
+            </div>              
+                     
+        </section>
+
+        <!-- تفاصيل الألعاب -->
+        
+        <section id="The Elder Scrolls V" class="game-details">
+            <button class="back-button" onclick="backToList()">العودة</button>
+    <h2>ᴛʜᴇ ᴇʟᴅᴇʀ sᴄʀᴏʟʟs ᴠ العربية</h2>
+    <div class="slider" id="slider27">
+<img src="سكايروم1.jpg" class="active" alt="صورة 1">
+ <img src="سكايروم2.jpg" alt="صورة 2">
+ <img src="سكايروم3.jpg" alt="صورة 3">      <img src="سكايروم4.jpg" alt="صورة 4">
+                <button class="arrow left">&lt;</button>
+                <button class="arrow right">&gt;</button>
+            </div>
+            <div class="feature-title" onclick="toggleDescription('description27')">مميــزات اللعبــة</div>
+            
+            <div class="feature-description" id="description27">
+                <ul>
+  
+  <li>ID:CUSA05486, Update:v1.26 </li>
+  <li>اللغــة العــربية : القــوائــم / الحــوارات</li>
+       <li> 30GB :حجــــــم اللعبـة</li>
+       <li> 12GB :حجــــــم التحــديـث</li>
+      <li> نــــوع اللعبــة: اكشــن </li>
+                </ul>
+            </div>
+            <div class="links">
+                <a href="">تحميل اللعبة</a>
+                <a href="">تحميل التحديث</a>
+                
+                <a href="">تحميل الاضافات</a>
+              
+            
+            </div>
+          </section>
+        
+        <section id="Dead Island 2" class="game-details">
+            <button class="back-button" onclick="backToList()">العودة</button>
+    <h2>ᴅᴇᴀᴅ ɪsʟᴀɴᴅ 2 العربية</h2>
+    <div class="slider" id="slider26">
+<img src="الجزيره3.jpg" class="active" alt="صورة 1">
+    <img src="الجزيره2.jpg" class="alt="صورة 2">
+        <img src="الجزيره1.jpg" alt="صورة 3">
+                <button class="arrow left">&lt;</button>
+                <button class="arrow right">&gt;</button>
+            </div>
+            <div class="feature-title" onclick="toggleDescription('description26')">مميــزات اللعبــة</div>
+            
+            <div class="feature-description" id="description26">
+                <ul>
+  
+  <li>UD:CUSA27043, Update:1.07 </li>
+  <li>اللغــة العــربية : القــوائــم / الحــوارات</li>
+       <li> 18GB :حجــــــم اللعبـة</li>
+       <li> 3GB :حجــــــم التحــديـث</li>
+      <li> نــــوع اللعبــة: اكشــن رعــــب</li>
+                </ul>
+            </div>
+            <div class="links">
+                <a href="https://filecrypt.co/Container/A7C08C6B58.html">تحميل اللعبة</a>
+                <a href="https://www.mediafire.com/file/e6xyoxba6bk8oir/EP4062-CUSA27043_00-DEADISLAND2GAME1Dead_Island_2-fix505-arabic-107.pkg/file">تحميل التحديث</a>
+                
+                <a href="https://filecrypt.co/Container/9E06625323.html">تحميل الاضافات</a>
+                
+            
+            </div>
+          </section>
+               
+        
+        <section id="Titan Souls" class="game-details">
+            <button class="back-button" onclick="backToList()">العودة</button>
+    <h2>ᴛɪᴛᴀɴ sᴏᴜʟs العربية</h2>
+            <div class="slider" id="slider25">
+                <img src="روح1.jpg" class="active" alt="صورة 1">
+                <img src="روح2.jpg" class="alt="صورة 2">
+                <img src="روح3.png" alt="صورة 3">
+                <button class="arrow left">&lt;</button>
+                <button class="arrow right">&gt;</button>
+            </div>
+            <div class="feature-title" onclick="toggleDescription('description25')">مميــزات اللعبــة</div>
+            
+            <div class="feature-description" id="description25">
+                <ul>
+  
+  <li>UD:CUSA01699, Update:1.01 </li>
+  <li>اللغــة العــربية : القــوائــم / الحــوارات</li>
+       <li> 31.75MB :حجــــــم اللعبـة</li>
+       <li> 174MG :حجــــــم التحــديـث</li>
+      <li> نـــــوع اللعبــة: اكشــن مغــــامـــرات </li>
+                </ul>
+            </div>
+            <div class="links">
+                <a href="https://www.mediafire.com/file/mrdejcli0d5ejj4/hako-prelude-ts.rar/file">تحميل اللعبة</a>
+                <a href="https://1fichier.com/?2vs5nhij8osa9sfoirve">تحميل التحديث</a>
+            </div>
+          </section>
+          
+            <section id="Little Nightmares II" class="game-details">
+            <button class="back-button" onclick="backToList()">العودة</button>
+    <h2>ʟɪᴛᴛʟᴇ ɴɪɢʜᴛᴍᴀʀᴇs  العربية</h2>
+            <div class="slider" id="slider24">
+                <img src="مربع3.png" class="active" alt="صورة 1">
+                <img src="مربع2.jpg" class="alt="صورة 2">
+                <img src="مربع3.jpg" alt="صورة 3">
+                <button class="arrow left">&lt;</button>
+                <button class="arrow right">&gt;</button>
+            </div>
+            <div class="feature-title" onclick="toggleDescription('description24')">مميــزات اللعبــة</div>
+            
+            <div class="feature-description" id="description24">
+                <ul>
+  
+  <li>CUSA05952 </li>
+         <li>اللغــة العــربية : القــوائــم / الحــوارات</li>
+       <li> 2.56GB :حجــــــم اللعبـة</li>
+       <li> 1.55GB :حجــــــم التحــديـث</li>
+      <li> نـــــوع اللعبــة:مغــــــامــــــرات رعــب الغــاز</li>
+                </ul>
+            </div>
+            <div class="links">
+                <a href="https://filecrypt.cc/Container/92F17E7B3B.html">تحميل اللعبة</a>
+                <a href="https://anotepad.com/notes/j8xh72er">تحميل التحديث</a>
+            </div>
+          </section>
+          
+          
+        
+        
+            <section id="Little Nightmares" class="game-details">
+            <button class="back-button" onclick="backToList()">العودة</button>
+            <h2> ʟɪᴛᴛʟᴇ ɴɪɢʜᴛᴍᴀʀᴇs II العربية</h2>
+            <div class="slider" id="slider23">
+    <img src="الصفر1.jpg" class="active" alt="صورة 1">
+            <img src="الصفر3.jpg" class="alt="صورة 2">
+                <img src="الصفر2.jpg" alt="صورة 3">
+                <button class="arrow left">&lt;</button>
+                <button class="arrow right">&gt;</button>
+            </div>
+            <div class="feature-title" onclick="toggleDescription('description23')">مميــزات اللعبــة</div>
+            
+            <div class="feature-description" id="description23">
+                <ul>
+  
+  <li>ID:'CUSA12779,Update 1.05</li>
+  <li>اللغــة العــربية : القــوائــم / الحــوارات</li>
+       <li> 3.86GB :حجــــــم اللعبـة</li>
+       <li> 80MB:حجــــــم التحــديـث</li>
+      <li> نـــــوع اللعبــة: مغــــــامــــــرات رعـــب الغـــاز</li>
+                </ul>
+            </div>
+            <div class="links">
+                <a href="https://filecrypt.co/Container/9E7F01B9F3.html">تحميل اللعبة</a>
+                <a href="https://filecrypt.co/Container/2BE86164FE.html">تحميل التحديث</a>
+            </div>
+          </section>
+          
+          
+           
+        
+          <section id="The Last of Us II" class="game-details">
+            <button class="back-button" onclick="backToList()">العودة</button>
+            <h2>ᴛʜᴇ ʟᴀsᴛ ᴏғ ᴜs ɪɪ العـــربية</h2>
+            <div class="slider" id="slider1">
+
+<img src="ذلاسسست1.webp"
+               class="active" alt="صورة 1">
+ <img src="ذلاسسست2.jpg"
+                         class="alt="صورة 2">
+        <img src="ذلاسسست3.jpg"  
+                               alt="صورة 3"> 
+        <button class="arrow left">&lt;</button>
+                <button class="arrow right">&gt;</button>
+            </div>
+            <div class="feature-title" onclick="toggleDescription('description1')">مميــزات اللعبــة</div>
+            
+            <div class="feature-description" id="description1">
+                <ul>
+  
+  <li>ID:CUSA10249 Update:v1.07 </li>
+         <li>اللغــة العــربية : القــوائــم / الحــوارات</li>
+       <li> 86GB :حجــــــم اللعبـة</li>
+       <li> 4GB :حجــــــم التحــديـث</li>
+      <li>نـــــوع اللعبــة: أكشــــن ومغـامــرات،رعـــب </li>
+      <li>التصنيف اللعـبة:
+🔞، بسبب مشاهد العنف الشديد، اللغة النابية، والمحتوى الناضج </li>
+                </ul>
+            </div>
+            <div class="links">
+                <a href="https://filecrypt.co/Container/2749FFDFCB">تحميل اللعبة</a>
+                <a href="https://filecrypt.co/Container/45296E4CE4">تحميل التحديـث</a>
+            </div>
+          </section>
+  
+        
+        <section id="The Last of Us I" class="game-details">
+    <button class="back-button" onclick="backToList()">العودة</button>
+    <h2>ᴛʜᴇ ʟᴀsᴛ ᴏғ ᴜs ɪ العربية</h2>
+    <div class="slider" id="slider2">
+        <img src="ذلاسست1.webp" class="active" alt="صورة 1">
+        <img src="ذلاسست2.jpg" alt="صورة 2">
+        <img src="ذلاسست3.jpg" alt="صورة 3">
+        <button class="arrow left">&lt;</button>
+        <button class="arrow right">&gt;</button>
+    </div>
+    <div class="feature-title" onclick="toggleDescription('description2')">مميــزات اللعبــة</div>
+    <div class="feature-description" id="description2">
+        <ul>
+            <li>ID: CUSA00556 </li>
+            <li>اللغــة العــربية : القــوائــم / الحــوارات</li>
+            <li> 44GB :حجــــــم اللعبـة</li>
+         
+            <li>نـــــوع اللعبــة: أكشـــــن و مغــامـــرات رعــب </li>
+        </ul>
+    </div>
+    <div class="links">
+        <a href="https://filecrypt.co/Container/90B0875ABD">تحميل اللعبة</a>
+    
+    </div>
+</section>
+             
+        <section id="LIES OF P" class="game-details">
+            <button class="back-button" onclick="backToList()">العودة</button>
+            <h2>ʟɪᴇs ᴏғ ᴘ العــربيـة</h2>
+            <div class="slider" id="slider3">
+                <img src="اكاذيب2.webp" class="active" alt="صورة 1">
+                <img src="كاذيب1.webp" alt="صورة 2">
+                <img src="اكاذيب3.webp" alt="صورة 3">
+                <button class="arrow left">&lt;</button>
+                <button class="arrow right">&gt;</button>
+            </div>
+            <div class="feature-title" onclick="toggleDescription('description3')">مميــزات اللعبــة</div>
+            <div class="feature-description" id="description3">
+                <ul>
+                    <li>ID:CUSA36848 Update:v1.05</li>
+                    <li>اللغــة العــربية: القـوائـم / الحــوارات</li>
+                    <li>13GB :حجــــــم اللعبـــــــة</li>
+                    <li>12GB :حجـــــم التحديـــــث </li>
+                    <li>نــوع اللعبـة: ســــولـــز لايــك</li>
+                </ul>
+            </div>
+            <div class="links">
+                <a href="https://filecrypt.co/Container/DB55FC4705.html">RAR تحميل اللعبة</a>
+                <a href="https://1fichier.com/?9cysr6yprbrrqcpbfhee&af=3662447">PKG تحميل اللعبة</a>
+                <a href="https://filecrypt.co/Container/CC8E6557F3.html">تحميل التحديث</a>
+                <a href="https://www.mediafire.com/file/zqdmdnipjykmifw/[DLPSGAME.COM]-Lies.of.P.CUSA36848.DLC.Pack-Arczi-CyB1K.rar/file">تحميل الإضافات</a>
+            </div>
+        </section>
+
+        <section id="Sekiro" class="game-details">
+            <button class="back-button" onclick="backToList()">العودة</button>
+            <h2>sᴇᴋɪʀᴏ العــربيــة</h2>
+            <div class="slider" id="slider4">
+                 <img src="سيكرو1.png" 
+class="active" alt="صورة 1">
+                 <img src="سكيرو2.webp" alt="صورة 2">
+                  <img src="سكيرو3.png" alt="صورة 3">
+                <button 
+                class="arrow left">&lt;</button>
+                <button 
+                class="arrow right">&gt;</button>
+            </div>
+            <div class="feature-title" onclick="toggleDescription('description4')">مميــزات اللعبــة</div>
+            <div class="feature-description" id="description4">
+                <ul>
+                    <li>ID:CUSA13801 Update:v1.05</li>
+                    <li>اللغــة العــربية: القـوائـم / الحــوارات</li>
+                    <li>12GB حجـم اللعبـة</li>
+                    <li>4GB حجم التـحديـث</li>
+                    <li> نــوع اللعبـة: ســــولـــز لايــك</li>
+                </ul>
+            </div>
+            <div class="links">
+                <a href="https://filecrypt.co/Container/DB55FC4705.html">تحميل اللعبة</a>
+                <a href="https://filecrypt.co/Container/D9E1BD5C59.html">تحميل التحديث</a>
+            </div>
+        </section>
+
+        <section id="Ghost of Tsushima" class="game-details">
+            <button class="back-button" onclick="backToList()">العودة</button>
+            <h2>ɢʜᴏsᴛ ᴏғ ᴛsᴜsʜɪᴍᴀ العــربيـة</h2>
+            <div class="slider" id="slider5">
+                <img src="شبح1.png" class="active" alt="صورة 1">
+                <img src="شبح2.png" alt="صورة 2">
+                <img src="شبح3.jpg" alt="صورة 3">
+                <button class="arrow left">&lt;</button>
+                <button class="arrow right">&gt;</button>
+            </div>
+            <div class="feature-title" onclick="toggleDescription('description5')">مميــزات اللعبــة</div>
+            <div class="feature-description" id="description5">
+                <ul>
+                    <li>CUSA13323 Update:v2.18</li>
+                    <li>اللغــة العــربية: القـوائـم / الحــوارات</li>
+                    <li>46.75GB حجـم اللعبــة </li>
+                    <li>47.38GB حجم التـحديـث</li>
+                    <li>اضـــافة جزيرة ايكـي</li>
+                    <li> SAVEDATA+ NEW GMAE </li>
+                    <li> نــوع اللعبــة: أكشــن، مغامـرات، عــالــم مفتـوح </li>
+                </ul>
+            </div>
+            <div class="links">
+                <a href="https://filecrypt.cc/Container/01F50CCB1F.html">RAR تحميل اللعبة</a>
+                <a href="https://1fichier.com/?sxjri5d9b67f3dj92pc7&af=2899507">PKG تحميل اللعبة</a>
+                <a href="https://filecrypt.cc/Container/63CEAAE3F3.html">RAR تحميل التحديث</a>
+                <a href="https://1fichier.com/?ixzkexuqvyb5xapf6l3p&af=2899507"> PKG تحميل التحديث</a>
+                <a href="https://filecrypt.cc/Container/6464B1EA82.html">DLC جـزيـرة ايكي</a>
+                <a href="https://t.me/olllllx/2741">SAVE DATA</a>
+            </div>
+        </section>
+
+        <section id="NEWGAME" class="game-details">
+            <button class="back-button" onclick="backToList()">العودة</button>
+            <h2>STAR WARS Jedi Fallen Order</h2>
+            <div class="slider" id="slider6">
+                <img src="حرب1.webp" class="active" alt="صورة 1">
+                <img src="حرب2.jpg" alt="صورة 2">
+                <img src="حرب3.jpg" alt="صورة 3">
+                <button class="arrow left">&lt;</button>
+                <button class="arrow right">&gt;</button>
+            </div>
+            <div class="feature-title" onclick="toggleDescription('description6')">مميــزات اللعبــة</div>
+            <div class="feature-description" id="description6">
+                <ul>
+                    <li>ID: CUSA12529 Update:1.12 </li>
+                    <li>اللغــة العــربية : القــوائــم / الحــوارات</li>
+                    <li>40GB :حجــــــم اللعبـة</li>
+                    <li>12GB :حجــــــم التحــديـث</li>
+                    <li>نـــــوع اللعبــة: أكشـــــن و مغــــــامــــــرات</li>
+                </ul>
+            </div>
+            <div class="links">
+                <a href="https://filecrypt.co/Container/6A4C2EB232.html">تحميل اللعبة</a>
+                <a href="https://filecrypt.co/Container/5E7E8AC824.html">تحميل التحديث</a>
+                    </div>
+        </section>
+
+        <section id="STAR" class="game-details">
+            <button class="back-button" onclick="backToList()">العودة</button>
+            <h2>STAR WARS Jedi: Survivor</h2>
+            <div class="slider" id="slider7">
+                <img src="حرب النجوم1.jpg" class="active" alt="صورة 1">
+                <img src="حرب النجوم2.jpg" alt="صورة 2">
+                <img src="حرب النجوم.jpg" alt="صورة 3">
+                <button class="arrow left">&lt;</button>
+                <button class="arrow right">&gt;</button>
+            </div>
+            <div class="feature-title" onclick="toggleDescription('description7')">مميــزات اللعبــة</div>
+            <div class="feature-description" id="description7">
+                <ul>
+      <li>ID:CUSA33778 Update: 1.03</li>
+   <li>اللغــة العــربية: القــوائــم / الحــوارات</li>
+                    <li>51.1GB :حجــــــم اللعبـة</li>
+          <li>125MB :حجــــــم التحــديـث </li>
+   <li> نـوع اللعبــة:كشــن،مغـــامــرات تقمــص أدوار RPG</li>
+                </ul>
+            </div>
+            <div class="links">
+                <a href="https://filecrypt.co/Container/6187FDF555.html#GamesPs4I">تحميل اللعبة</a>
+                <a href="https://www.mediafire.com/file/9zgaefpcvk22u56/STAR.WARS.Jedi.Survivor_CUSA33778_v1.03_BACKPORT_[6.72].pkg/file?dkey=mea9guja7q9&r=1446">تحميل التحديث</a>
+            </div>
+        </section>
+        
+          <section id="RED" class="game-details">
+            <button class="back-button" onclick="backToList()">العودة</button>
+            <h2>ʀᴇᴅ ʀᴇᴀᴅ ʀᴇᴅᴇᴍᴘᴛɪᴏɴ 2 العـــربـية</h2>
+            <div class="slider" id="slider8">
+     <img src="ريد11.jpg" class="active" alt="صورة 1">
+    <img src="ريد2.jpg" alt="صورة2 ">
+
+                <img src="ريد3.jpg" alt="صورة 3">
+                <button class="arrow left">&lt;</button>
+                <button class="arrow right">&gt;</button>
+            </div>
+            <div class="feature-title" onclick="toggleDescription('description8')">مميــزات اللعبــة</div>
+            <div class="feature-description" id="description8">
+                <ul>
+                    <li>ID: CUSA12345 Update:1.0</li>
+                    <li>اللغــة العــربية: القــوائــم / الحــوارات</li>
+                    <li>45GB :حجــــــم اللعبـة</li>
+                    <li>15GB :حجــــــم التحــديـث</li>
+                    <li>نـــــوع اللعبــة: أكشـــــن و مغــــــامــــــرات</li>
+                </ul>
+            </div>
+            <div class="links">
+                <a href="">تحميل اللعبة</a>
+                <a href="">تحميل التحديث</a>
+                <a href="">تحميل الإضافات</a>
+            </div>
+        </section>
+        
+        <section id="Grand" class="game-details">
+            <button class="back-button" onclick="backToList()">العودة</button>
+            <h2>Grand Theft Auto V </h2>
+            <div class="slider" id="slider9">
+                <img src="كراند111.webp" class="active" alt="صورة 1">
+                <img src="كراند2.jpg" class="alt="صورة 2">
+                <img src="كراند1111.webp" alt="صورة 3">
+                  <img src="كراند22.webp" alt="صورة 4">
+                    <img src="كراند21.webp" alt="صورة 5">
+                <button class="arrow left">&lt;</button>
+                <button class="arrow right">&gt;</button>
+            </div>
+            <div class="feature-title" onclick="toggleDescription('description9')">مميــزات اللعبــة</div>
+            
+            <div class="feature-description" id="description9">
+                <ul>
+  
+  <li>ID:CUSA00419 Update:v1.51 </li>
+         <li>اللغــة العــربية: القــوائــم / الحــوارات</li>
+       <li> 40GB :حجــــــم اللعبـة</li>
+       <li> 46GB :حجــــــم التحــديـث</li>
+      <li> نــوع اللعبــة: أكشـــــن ومغــــامـــرات عالـم مفتـوح</li>
+                </ul>
+            </div>
+            <div class="links">
+                <a href="https://filecrypt.co/Container/83F485D1DD.html">تحميل اللعبة</a>
+                <a href="https://filecrypt.co/Container/E38BEA2265.html">تحميل التحديث</a>
+                <a href="https://www.mediafire.com/file/i1v9wrrxg0la375/GamesPs4I/file">تحميل التعريب</a>
+            </div>
+          </section>
+  
+  <section id="Battlefield1" class="game-details">
+            <button class="back-button" onclick="backToList()">العودة</button>
+            <h2>ʙᴀᴛᴛʟᴇғɪᴇʟᴅ 1 العربية</h2>
+            <div class="slider" id="slider10">
+                <img src="بتل1.jpg" class="active" alt="صورة 1">
+                <img src="بتل2.jpg" class="alt="صورة 2">
+                <img src="بتل3.jpg" alt="صورة 3">
+                <button class="arrow left">&lt;</button>
+                <button class="arrow right">&gt;</button>
+            </div>
+            <div class="feature-title" onclick="toggleDescription('description10')">مميــزات اللعبــة</div>
+            
+            <div class="feature-description" id="description10">
+                <ul>
+  
+  <li>ID: CUSA12529 Update:1.12 </li>
+         <li>اللغــة العــربية : القــوائــم / الحــوارات</li>
+       <li>41.93GB:حجـــم اللعــــبة</li>
+       <li> 26.79GB :حجــــــم التحــديـث</li>
+      <li>نـــــوع اللعبــة: أكشـــــن حـــــروب</li>
+                </ul>
+            </div>
+            <div class="links">
+                <a href="https://1fichier.com/?98a4y3zui1ek728ixqz9">تحميل اللعبة</a>
+                <a href="https://filecrypt.cc/Container/1D3274B9D0.html">تحميل التحديث</a>
+     
+            </div>
+          </section>
+          
+          <section id="BattlefieldV" class="game-details">
+            <button class="back-button" onclick="backToList()">العودة</button>
+            <h2> ʙᴀᴛᴛʟᴇғɪᴇʟᴅ ᴠ العربية</h2>
+            <div class="slider" id="slider11">
+                <img src="فيلد1.jpg" class="active" alt="صورة 1">
+                <img src="فيلد2.jpg" class="alt="صورة 2">
+                <img src="فيلد3.jpg" alt="صورة 3">
+                <button class="arrow left">&lt;</button>
+                <button class="arrow right">&gt;</button>
+            </div>
+            <div class="feature-title" onclick="toggleDescription('description11')">مميــزات اللعبــة</div>
+            
+            <div class="feature-description" id="description11">
+                <ul>
+  
+  <li>ID: CUSA12529 Update:1.12 </li>
+         <li>اللغــة العــربية : القــوائــم / الحــوارات</li>
+       <li> 31.63GB:حجــــــم اللعبـة</li>
+       <li> GB:حجــــــم التحــديـث</li>
+      <li>نـــــوع اللعبــة: أكشـن حــروب</li>
+                </ul>
+            </div>
+            <div class="links">
+                <a href="https://filecrypt.co/Container/13EC1E7E64.html">تحميل اللعبة</a>
+                <a href="https://filecrypt.co/Container/8C2266A752">تحميل التحديث</a>
+   <a             href="https://www.mediafire.com/file/r3jrn65sjug8gaz/file?dkey=whyzbvkwc3u&r=267">تحميل الاضافات</a>
+               
+            </div>
+          </section>
+  
+  <section id="Horizon Zero Dawn" class="game-details">
+            <button class="back-button" onclick="backToList()">العودة</button>
+            <h2>ʜᴏʀɪᴢᴏɴ ᴢᴇʀᴏ ᴅᴀᴡɴ العــربيـة</h2>
+            <div class="slider" id="slider12">
+                <img src="زيرو داون1.jpg" class="active" alt="صورة 1">
+                <img src="زيرو داون2.jpg" class="alt="صورة 2">
+                <img src="زيرو داون3.jpg" alt="صورة 3">
+                <button class="arrow left">&lt;</button>
+                <button class="arrow right">&gt;</button>
+            </div>
+            <div class="feature-title" onclick="toggleDescription('description12')">مميــزات اللعبــة</div>
+            
+            <div class="feature-description" id="description12">
+                <ul>
+  
+  <li>ID: CUSA10213 Update:1.54</li>
+         <li>اللغــة العــربية : القــوائــم / الحــوارات</li>
+       <li> 46.54GB:حجــــــم اللعبـة</li>
+       <li>298.38MB:حجــــــم التحــديـث</li>
+      <li>نــوع اللعبــة: أكشـــــن ومغــــامـــرات عالـم مفتـوح ʀᴘɢ </li>
+                </ul>
+            </div>
+            <div class="links">
+                <a href="https://filecrypt.cc/Container/9AEAFF6051.html">تحميل اللعبة</a>
+                <a href="https://filecrypt.cc/Container/DDB54A09C8.html">تحميل التحديث</a>
+                </div>
+          </section>
+  
+    <section id="Horizon Forbidden West" class="game-details">
+            <button class="back-button" onclick="backToList()">العودة</button>
+            <h2>ʜᴏʀɪᴢᴏɴ ғᴏʀʙɪᴅᴅᴇɴ ᴡᴇsᴛ العـربيــة</h2>
+            <div class="slider" id="slider13">
+                <img src="الغرب22.jpg" class="active" alt="صورة 1">
+                <img src="الغرب11.png" class="alt="صورة 2">
+                <img src="الغرب2.jpg" alt="صورة 3">
+                <button class="arrow left">&lt;</button>
+                <button class="arrow right">&gt;</button>
+            </div>
+            <div class="feature-title" onclick="toggleDescription('description13')">مميــزات اللعبــة</div>
+            
+            <div class="feature-description" id="description13">
+                <ul>
+  
+  <li>ID:CUSA24705 Update:1.10 </li>
+         <li>اللغــة العــربية : القــوائــم / الحــوارات /دبلــجة</li>
+       <li> 40GB :حجــــــم اللعبـة</li>
+       <li> 12GB :حجــــــم التحــديـث</li>
+      <li> نـــــوع اللعبــة: أكشــن و مغــامــرات عالــم مفتــوح ʀᴘɢ </li>
+                </ul>
+            </div>
+            <div class="links">
+                <a href="https://1fichier.com/?p6slc9p4oxoi5pisnuve">تحميل اللعبة + الاضافات</a>
+                <a href="https://filecrypt.cc/Container/AAE2C1DB3A.html">تحميل التحديث</a>
+            
+            </div>
+          </section>
+  
+          <section id="Tomb Raider Definitiv" class="game-details">
+            <button class="back-button" onclick="backToList()">العودة</button>
+            <h2>ᴛᴏᴍʙ ʀᴀɪᴅᴇʀ ᴅᴇғɪɴɪᴛɪᴠ العــربية</h2>
+            <div class="slider" id="slider14">
+                <img src="ديفايز5.webp" class="active" alt="صورة 1">
+                <img src="ديفايز1.webp" class="alt="صورة 2">
+                <img src="ديفايز3.webp" alt="صورة 3">
+                <img src="ديفايز4.webp" alt="صورة 4">
+                <img src="ديفايز2.webp" alt="صورة 5">
+                <button class="arrow left">&lt;</button>
+                <button class="arrow right">&gt;</button>
+            </div>
+            <div class="feature-title" onclick="toggleDescription('description14')">مميــزات اللعبــة</div>
+            
+            <div class="feature-description" id="description14">
+                <ul>
+  
+  <li>ID: CUSA00109 </li>
+         <li>اللغــة العــربية : القــوائــم / الحــوارات</li>
+       <li> 18GB :حجــــــم اللعبـة</li>
+    
+      <li>نــوع اللعبـة: أكشــن و مغــامـرات </li>
+                </ul>
+            </div>
+            <div class="links">
+                <a href="https://filecrypt.co/Container/BF79D6D10B.html">تحميل اللعبة</a>
+                
+            </div>
+          </section>
+  
+          <section id="Rise of The Tomb Raider" class="game-details">
+            <button class="back-button" onclick="backToList()">العودة</button>
+            <h2>Rise of The Tomb Raider العربية</h2>
+            <div class="slider" id="slider15">
+                <img src="تومب11.jpg" class="active" alt="صورة 1">
+                <img src="تومب2.jpg" class="alt="صورة 2">
+                <img src="تومب3.jpg" alt="صورة 3">
+                <button class="arrow left">&lt;</button>
+                <button class="arrow right">&gt;</button>
+            </div>
+            <div class="feature-title" onclick="toggleDescription('description15')">مميــزات اللعبــة</div>
+            
+            <div class="feature-description" id="description15">
+                <ul>
+  
+  <li>ID: CUSA05720 Update:1.06 </li>
+         <li>اللغــة العــربية : القــوائــم / الحــوارات</li>
+       <li> 15GB :حجــــــم اللعبـة</li>
+       <li> 2GB :حجــــــم التحــديـث</li>
+      <li>نـــــوع اللعبــة: أكشـــــن و مغــامــرات</li>
+                </ul>
+            </div>
+            <div class="links">
+                <a href="https://filecrypt.co/Container/54491DE386.html">تحميل اللعبة</a>
+                <a href="https://filecrypt.co/Container/C0E5AFA69D.html">تحميل التحديث</a>
+           
+            </div>
+          </section>
+  
+        
+         <section id="Shadow of The Tomb" class="game-details">
+            <button class="back-button" onclick="backToList()">العودة</button>
+            <h2>sʜᴀᴅᴏᴡ ᴏғ ᴛʜᴇ ᴛᴏᴍʙ ʀᴀɪᴅᴇʀ العربية</h2>
+            <div class="slider" id="slider16">
+                <img src="شادو1.jpg" class="active" alt="صورة 1">
+                <img src="شادو2.jpg" class="alt="صورة 2">
+       <img src="شادو3.jpg" alt="صورة 3">
+       <img src="شادو4.jpg" alt="صورة 4">
+                <button class="arrow left">&lt;</button>
+                <button class="arrow right">&gt;</button>
+            </div>
+            <div class="feature-title" onclick="toggleDescription('description16')">مميــزات اللعبــة</div>
+            
+            <div class="feature-description" id="description16">
+                <ul>
+  
+  <li>ID: CUSA12089 Update:1.03 </li>
+         <li>اللغــة العــربية : القــوائــم / الحــوارات / دبــلجة</li>
+       <li> 20GB :حجــــــم اللعبـة</li>
+       <li> 3GB :حجــــــم التحــديـث</li>
+      <li> نـــــوع اللعبــة: أكشـــــن و مغــــــامــــــرات</li>
+                </ul>
+            </div>
+            <div class="links">
+                <a href="https://filecrypt.co/Container/CD66B09A82.html">تحميل اللعبة</a>
+                <a href="https://filecrypt.co/Container/87AB218D4D.html">تحميل التحديث</a>
+            
+            </div>
+          </section>
+  
+  
+    <section id="Days Gone" class="game-details">
+            <button class="back-button" onclick="backToList()">العودة</button>
+            <h2>Horizon Zero Dawn</h2>
+            <div class="slider" id="slider17">
+                <img src="ديزكون1.webp" class="active" alt="صورة 1">
+                <img src="ديزكون2.webp" class="alt="صورة 2">
+   <img src="ديزكون21.jpg" alt="صورة 3">
+       <img src="ديزكون22.jpg" alt="صورة 4">
+    <img src="ديزكون23.jpg" alt="صورة 5">
+                <button class="arrow left">&lt;</button>
+                <button class="arrow right">&gt;</button>
+            </div>
+            <div class="feature-title" onclick="toggleDescription('description17')">مميــزات اللعبــة</div>
+            
+            <div class="feature-description" id="description17">
+                <ul>
+  
+  <li>ID: CUSA15027 Update:1.51 </li>
+    <li> اللغــة العــربية : القــوائــم / ودبــلـجة</li>
+       <li> 33GB :حجــــــم اللعبـة</li>
+       <li> 122.12MB :حجــــــم التحــديـث</li>
+      <li>نـــوع اللعبــة: أكشــن و مغــامــرات عـــالــم مفتـوح زومبــي</li>
+                </ul>
+            </div>
+            <div class="links">
+                <a href="https://filecrypt.co/Container/09B94CCBC6.html">تحميل اللعبة</a>
+                <a href="https://filecrypt.co/Container/A9205DE361.html">تحميل التحديث</a>
+                <a href="https://www.mediafire.com/file/159m7z7cis6ovut/Days.Gone_dlc.rar/file?dkey=1bapk9f8r9q&r=910">تحميل الإضافات</a>
+            </div>
+          </section>
+  
+  
+   <section id="Control" class="game-details">
+            <button class="back-button" onclick="backToList()">العودة</button>
+            <h2>ᴄᴏɴᴛʀᴏʟ العربية</h2>
+            <div class="slider" id="slider18">
+                <img src="تحكم2.jpg" class="active" alt="صورة 1">
+                <img src="تحكم3.jpg" class="alt="صورة 2">
+                <img src="تحكم1.jpg" alt="صورة 3">
+                <button class="arrow left">&lt;</button>
+                <button class="arrow right">&gt;</button>
+            </div>
+            <div class="feature-title" onclick="toggleDescription('description18')">مميــزات اللعبــة</div>
+            
+            <div class="feature-description" id="description18">
+                <ul>
+  
+  <li>ID: CUSA11461 Update:1.12 </li>
+         <li>اللغــة العــربية : القــوائــم / الحــوارات</li>
+       <li> 22GB :حجــــــم اللعبـة</li>
+       <li> 15GB :حجــــــم التحــديـث</li>
+      <li>نــوع اللعبــة: أكشـن و مغـامــرات خيـال علـمي</li>
+                </ul>
+            </div>
+            <div class="links">
+                <a href="https://filecrypt.cc/Container/B72111D9CB.html">تحميل اللعبة</a>
+                <a href="https://filecrypt.cc/Container/ACEC194A2F.html">تحميل التحديث</a>
+             
+            </div>
+          </section>
+  
+   <section id="Marvels Spider-Man" class="game-details">
+            <button class="back-button" onclick="backToList()">العودة</button>
+            <h2>ᴍᴀʀᴠᴇʟs sᴘɪᴅᴇʀ-ᴍᴀɴ العربية</h2>
+            <div class="slider" id="slider19">
+                <img src="سبايدي1.jpg" class="active" alt="صورة 1">
+                <img src="سبايدي2.jpg" class="alt="صورة 2">
+                <img src="سبايدي3.jpg" alt="صورة 3">
+                <button class="arrow left">&lt;</button>
+                <button class="arrow right">&gt;</button>
+            </div>
+            <div class="feature-title" onclick="toggleDescription('description19')">مميــزات اللعبــة</div>
+            
+            <div class="feature-description" id="description19">
+                <ul>
+  
+  <li>ID: CUSA11995 Update:1.12 </li>
+         <li>اللغــة العــربية : القــوائــم / الحــوارات</li>
+       <li> 69.53GB :حجــــــم اللعبـة</li>
+       <li> 17GB :حجــــــم التحــديـث</li>
+      <li>نـــــوع اللعبــة: أكشـــــن و مغــــــامــــــرات</li>
+                </ul>
+            </div>
+            <div class="links">
+                <a href="https://filecrypt.co/Container/26941798F0.html#GamesPs4I/%D8%A7%D9%84%D8%B9%D8%A7%D8%A8_%D9%85%D9%87%D9%83%D8%B1">تحميل اللعبة</a>
+                <a href="https://filecrypt.co/Container/A0C1C6DE01.html#GamesPs4I/%D8%A7%D9%84%D8%B9%D8%A7%D8%A8_%D9%85%D9%87%D9%83%D8%B1">تحميل التحديث</a>
+                <a href="https://filecrypt.co/Container/02E4FDB9D2.html#GamesPs4I\%D8%A7%D9%84%D8%B9%D8%A7%D8%A8_%D8%A7%D9%84%D9%85%D9%87%D9%83%D8%B1">تحميل الإضافات</a>
+                
+            </div>
+          </section>
+  
+     <section id="Marvels Spaider Man Mailes Morales" class="game-details">
+            <button class="back-button" onclick="backToList()">العودة</button>
+            <h2>ᴍᴀʀᴠᴇʟs sᴘᴀɪᴅᴇʀ ᴍᴀɴ ᴍᴀɪʟᴇs ᴍᴏʀᴀʟᴇs العربية</h2>
+            <div class="slider" id="slider20">
+                <img src="مايلز1.jpg" class="active" alt="صورة 1">
+                <img src="مايلز33.jpg" class="alt="صورة 2">
+                <img src="مايلز3.jpg" alt="صورة 3">
+                <button class="arrow left">&lt;</button>
+                <button class="arrow right">&gt;</button>
+            </div>
+            <div class="feature-title" onclick="toggleDescription('description20')">مميــزات اللعبــة</div>
+            
+            <div class="feature-description" id="description20">
+                <ul>
+  
+  <li>ID:CUSA20177 </li>
+         <li>اللغــة العــربية : القــوائــم / الحــوارات</li>
+       <li> 51GB :حجــــــم اللعبـة</li>
+       <li> 11.32GB :حجــــــم التحــديـث</li>
+      <li>نـــــوع اللعبــة: أكشـــــن و مغــــــامــــــرات</li>
+                </ul>
+            </div>
+            <div class="links">
+                <a href="https://filecrypt.co/Container/9E7F01B9F3.html">تحميل اللعبة</a>
+                <a href="https://filecrypt.co/Container/2BE86164FE.html">تحميل التحديث</a>
+            </div>
+          </section>
+          
+              <section id="Watch Dogs 2" class="game-details">
+            <button class="back-button" onclick="backToList()">العودة</button>
+            <h2> ᴡᴀᴛᴄʜ ᴅᴏɢs 2 العربية</h2>
+            <div class="slider" id="slider21">
+                <img src="وج1.jpg" class="active" alt="صورة 1">
+                <img src="وج2.jpeg" class="alt="صورة 2">
+                <img src="وج3.jpg" alt="صورة 3">
+                <button class="arrow left">&lt;</button>
+                <button class="arrow right">&gt;</button>
+            </div>
+            <div class="feature-title" onclick="toggleDescription('description21')">مميــزات اللعبــة</div>
+            
+            <div class="feature-description" id="description21">
+                <ul>
+  
+  <li>ID:CUSA04295، Update: 1.17</li>
+         <li>اللغــة العــربية : الحــوارات</li>
+       <li> 20GB :حجــــــم اللعبـة</li>
+       <li> 10GB :حجــــــم التحــديـث</li>
+      <li>نـــــوع اللعبــة: أكشـــــن / عالــــــم مفتــــــوح</li>
+                </ul>
+            </div>
+            <div class="links">
+                <a href="https://filecrypt.co/Container/38C0B568CE.html">تحميل اللعبة</a>
+                <a href="https://www.mediafire.com/file/fol8gtvu18wymjt/file">تحميل التحديث</a>
+                                <a href="https://www.mediafire.com/file/xhqq8whnf1t3bq9/file">تحميل الاضافات</a>
+            </div>
+          </section>
+          
+              <section id="Watch Dogs Legion" class="game-details">
+            <button class="back-button" onclick="backToList()">العودة</button>
+    <h2> ᴡᴀᴛᴄʜ ᴅᴏɢs ʟᴇɢɪᴏɴ العربية</h2>
+            <div class="slider" id="slider22">
+                <img src="الكلاب3.webp" class="active" alt="صورة 1">
+                <img src="الكلاب2.webp" class="alt="صورة 2">
+                <img src="الكلاب1.webp" alt="صورة 3">
+                <button class="arrow left">&lt;</button>
+                <button class="arrow right">&gt;</button>
+            </div>
+            <div class="feature-title" onclick="toggleDescription('description22')">مميــزات اللعبــة</div>
+            
+            <div class="feature-description" id="description22">
+                <ul>
+  
+  <li>ID:CUSA13115, Update:v1.24 </li>
+ <li>اللغــة العــربية : القــوائــم / الحــوارات</li>
+       <li>30GB:حجــــــم اللعبـة</li>
+       <li> 20GB :حجــــــم التحــديـث</li>
+      <li>نــوع اللعبــة: أكشــن و مغـامـرات عالــم مفتــوح</li>
+                </ul>
+            </div>
+            <div class="links">
+                <a href="https://filecrypt.co/Container/FF994C37FE.html">تحميل اللعبة</a>
+                <a href="https://filecrypt.co/Container/F8D4DAF2CF.html">تحميل التحديث</a>
+            </div>
+          </section>
+          
+          
+    </div>
+    
+</section>
+</html>
+
